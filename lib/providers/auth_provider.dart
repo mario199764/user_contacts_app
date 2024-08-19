@@ -42,8 +42,8 @@ class AuthProvider extends ChangeNotifier {
     _isAuthenticated = false;
     _email = null;
     _username = null;
-    _avatar = null; // Limpiar avatar
-    await _sessionManager.clearSession(); // Borrar sesión
+    _avatar = null;
+    await _sessionManager.clearSession();
     notifyListeners();
   }
 

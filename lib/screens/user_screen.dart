@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +20,7 @@ class UserScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () {
               _showLogoutConfirmationDialog(context, authProvider);
             },
@@ -35,29 +37,29 @@ class UserScreen extends StatelessWidget {
                 backgroundImage: FileImage(File(authProvider.avatar!)),
               )
             else
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 50,
                 child: Icon(Icons.person, size: 50),
               ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 _showImageSourceActionSheet(context, authProvider);
               },
-              child: Text('Edit Image'),
+              child: const Text('Editar imagen'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (authProvider.username != null)
               Text(
-                'Welcome, ${authProvider.username}',
-                style: TextStyle(fontSize: 24),
+                'Bienvenido, ${authProvider.username}',
+                style: const TextStyle(fontSize: 24),
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 _showLogoutConfirmationDialog(context, authProvider);
               },
-              child: Text('Logout'),
+              child: const Text('Cerrar sesión'),
             ),
           ],
         ),
@@ -74,11 +76,11 @@ class UserScreen extends StatelessWidget {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'User',
+            label: 'Usuario',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.contacts),
-            label: 'Contacts',
+            label: 'Contactos',
           ),
         ],
       ),
@@ -94,8 +96,8 @@ class UserScreen extends StatelessWidget {
           child: Wrap(
             children: <Widget>[
               ListTile(
-                leading: Icon(Icons.camera_alt),
-                title: Text('Take a photo'),
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Tomar una foto'),
                 onTap: () async {
                   final picker = ImagePicker();
                   final pickedFile =
@@ -108,8 +110,8 @@ class UserScreen extends StatelessWidget {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.photo_library),
-                title: Text('Choose from gallery'),
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Elegir de la galería'),
                 onTap: () async {
                   final picker = ImagePicker();
                   final pickedFile =
@@ -134,14 +136,14 @@ class UserScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Logout'),
-          content: Text('Are you sure you want to logout?'),
+          title: const Text('Confirmar cerrar sesión'),
+          content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
             TextButton(
               onPressed: () {
@@ -149,7 +151,7 @@ class UserScreen extends StatelessWidget {
                 authProvider.logout();
                 Navigator.pushReplacementNamed(context, '/');
               },
-              child: Text('Yes'),
+              child: const Text('Sí'),
             ),
           ],
         );

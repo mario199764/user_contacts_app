@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Ingreso'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -57,18 +57,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty || !value.contains('@')) {
-                    return 'Please enter a valid email';
+                    return 'Por favor introduce un email válido';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Contraseña'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
+                    return 'Por favor ingrese su contraseña';
                   }
                   return null;
                 },
@@ -86,7 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.pushReplacementNamed(context, '/user');
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Invalid credentials')),
+                              SnackBar(
+                                  content: Text('Credenciales no válidas')),
                             );
                           }
                         }

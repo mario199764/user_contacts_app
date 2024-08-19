@@ -94,8 +94,7 @@ class DatabaseService {
     );
 
     if (result.isNotEmpty) {
-      return result
-          .first; // Retorna el primer resultado (que contiene username, email y password)
+      return result.first;
     }
     return null;
   }

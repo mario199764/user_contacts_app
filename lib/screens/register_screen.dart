@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
 
@@ -28,11 +30,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? validateUsername(String? value) {
     final usernameRegex = RegExp(r'^[a-zA-Z]+$');
     if (value == null || value.isEmpty) {
-      return 'Username is required';
+      return 'El nombre de usuario es obligatorio';
     } else if (value.length < 4 || value.length > 50) {
-      return 'Username must be between 4 and 50 characters';
+      return 'El nombre de usuario debe tener entre 4 y 50 caracteres';
     } else if (!usernameRegex.hasMatch(value)) {
-      return 'Username can only contain letters';
+      return 'El nombre de usuario solo puede contener letras';
     }
     return null;
   }
@@ -41,11 +43,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final emailRegex =
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     if (value == null || value.isEmpty) {
-      return 'Email is required';
+      return 'Email es requerido';
     } else if (value.length < 6 || value.length > 50) {
-      return 'Email must be between 6 and 50 characters';
+      return 'Email debe tener entre 6 y 50 caracteres';
     } else if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email address';
+      return 'Introduzca email válida';
     }
     return null;
   }
@@ -54,43 +56,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final passwordRegex =
         RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$&*~]).{10,60}$');
     if (value == null || value.isEmpty) {
-      return 'Password is required';
+      return 'La contraseña es requerida';
     } else if (value.length < 10 || value.length > 60) {
-      return 'Password must be between 10 and 60 characters';
+      return 'La contraseña debe tener entre 10 y 60 caracteres';
     } else if (!passwordRegex.hasMatch(value)) {
-      return 'Password must contain upper, lower, number, and special character';
+      return 'La contraseña debe contener caracteres superiores, inferiores, numéricos y especiales';
     }
     return null;
   }
 
   String? validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
+      return 'Por favor confirme su contraseña';
     } else if (value != _passwordController.text) {
-      return 'Passwords do not match';
+      return 'Las contraseñas no coinciden';
     }
     return null;
   }
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Crear el usuario como un Map
       Map<String, dynamic> user = {
         'username': _usernameController.text,
         'email': _emailController.text,
         'password': _passwordController.text,
       };
 
-      // Intentar agregar el usuario a la base de datos
       int result = await _databaseService.addUser(user);
 
       if (result != -1) {
-        // Registro exitoso, navegar a la pantalla de login
         Navigator.pushReplacementNamed(context, '/');
       } else {
-        // Error al registrar el usuario
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error registering user. Please try again.')),
+          const SnackBar(
+              content: Text(
+                  'Error al registrar usuario. Por favor inténtalo de nuevo.')),
         );
       }
     }
@@ -100,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register'),
+        title: const Text('Registrar'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -110,7 +110,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               TextFormField(
                 controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
+                decoration:
+                    const InputDecoration(labelText: 'Nombre de usuario'),
                 validator: validateUsername,
               ),
               TextFormField(
@@ -121,14 +122,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Contraseña'),
                 obscureText: !_isPasswordVisible,
                 validator: validatePassword,
               ),
               TextFormField(
                 controller: _confirmPasswordController,
                 decoration:
-                    const InputDecoration(labelText: 'Confirm Password'),
+                    const InputDecoration(labelText: 'Confirmar Contraseña'),
                 obscureText: !_isPasswordVisible,
                 validator: validateConfirmPassword,
               ),
@@ -142,13 +143,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       });
                     },
                   ),
-                  const Text('Show Passwords'),
+                  const Text('Mostrar contraseñas'),
                 ],
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitForm,
-                child: const Text('Register'),
+                child: const Text('Registrar'),
               ),
             ],
           ),
