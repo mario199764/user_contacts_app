@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import '../providers/auth_provider.dart';
 
 class UserScreen extends StatelessWidget {
@@ -13,7 +15,7 @@ class UserScreen extends StatelessWidget {
           authProvider.username != null
               ? 'Name: ${authProvider.username}'
               : 'User',
-        ), // Muestra el username como parte del encabezado
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
@@ -27,10 +29,27 @@ class UserScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (authProvider.username !=
-                null) // Verificar si el username no es nulo
+            if (authProvider.avatar != null && authProvider.avatar!.isNotEmpty)
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: FileImage(File(authProvider.avatar!)),
+              )
+            else
+              CircleAvatar(
+                radius: 50,
+                child: Icon(Icons.person, size: 50),
+              ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                _showImageSourceActionSheet(context, authProvider);
+              },
+              child: Text('Edit Image'),
+            ),
+            SizedBox(height: 20),
+            if (authProvider.username != null)
               Text(
-                'Welcome, ${authProvider.username}', // Muestra el username en el cuerpo
+                'Welcome, ${authProvider.username}',
                 style: TextStyle(fontSize: 24),
               ),
             SizedBox(height: 20),
@@ -44,7 +63,15 @@ class UserScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        currentIndex: 0,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pushNamed(context, '/user');
+          } else if (index == 1) {
+            Navigator.pushNamed(context, '/contacts');
+          }
+        },
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'User',
@@ -54,15 +81,50 @@ class UserScreen extends StatelessWidget {
             label: 'Contacts',
           ),
         ],
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, '/user');
-          } else if (index == 1) {
-            // Redirigir a la pantalla de contactos (aún por implementar)
-            // Navigator.pushNamed(context, '/contacts');
-          }
-        },
       ),
+    );
+  }
+
+  void _showImageSourceActionSheet(
+      BuildContext context, AuthProvider authProvider) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text('Take a photo'),
+                onTap: () async {
+                  final picker = ImagePicker();
+                  final pickedFile =
+                      await picker.pickImage(source: ImageSource.camera);
+
+                  if (pickedFile != null) {
+                    await authProvider.updateAvatar(pickedFile.path);
+                  }
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Choose from gallery'),
+                onTap: () async {
+                  final picker = ImagePicker();
+                  final pickedFile =
+                      await picker.pickImage(source: ImageSource.gallery);
+
+                  if (pickedFile != null) {
+                    await authProvider.updateAvatar(pickedFile.path);
+                  }
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -77,13 +139,13 @@ class UserScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Cierra el diálogo
+                Navigator.of(context).pop();
               },
               child: Text('No'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Cierra el diálogo
+                Navigator.of(context).pop();
                 authProvider.logout();
                 Navigator.pushReplacementNamed(context, '/');
               },

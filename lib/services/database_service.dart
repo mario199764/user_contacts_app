@@ -25,6 +25,7 @@ class DatabaseService {
       path,
       version: 1,
       onCreate: _createDB,
+      onUpgrade: _onUpgrade,
       onOpen: (db) async {
         await _checkAndCreateTables(db);
       },
@@ -45,6 +46,7 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
         email TEXT NOT NULL UNIQUE,
+        avatar TEXT NULLABLE,
         password TEXT NOT NULL
     )
     ''');
@@ -96,6 +98,22 @@ class DatabaseService {
           .first; // Retorna el primer resultado (que contiene username, email y password)
     }
     return null;
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute("ALTER TABLE users ADD COLUMN avatar TEXT");
+    }
+  }
+
+  Future<void> updateAvatar(String email, String avatarPath) async {
+    final db = await database;
+    await db.update(
+      'users',
+      {'avatar': avatarPath},
+      where: 'email = ?',
+      whereArgs: [email],
+    );
   }
 
   Future<int> addUser(Map<String, dynamic> user) async {
