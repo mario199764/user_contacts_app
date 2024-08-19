@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/database_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -15,8 +17,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final DatabaseService _databaseService = DatabaseService();
-
   bool _isPasswordVisible = false;
+  File? _profileImage;
 
   @override
   void dispose() {
@@ -47,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } else if (value.length < 6 || value.length > 50) {
       return 'Email debe tener entre 6 y 50 caracteres';
     } else if (!emailRegex.hasMatch(value)) {
-      return 'Introduzca email válida';
+      return 'Introduzca un email válido';
     }
     return null;
   }
@@ -60,7 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } else if (value.length < 10 || value.length > 60) {
       return 'La contraseña debe tener entre 10 y 60 caracteres';
     } else if (!passwordRegex.hasMatch(value)) {
-      return 'La contraseña debe contener caracteres superiores, inferiores, numéricos y especiales';
+      return 'La contraseña debe contener mayúsculas, minúsculas, números y caracteres especiales';
     }
     return null;
   }
@@ -74,12 +76,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return null;
   }
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+    }
+  }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       Map<String, dynamic> user = {
         'username': _usernameController.text,
         'email': _emailController.text,
         'password': _passwordController.text,
+        'avatar': _profileImage?.path,
       };
 
       int result = await _databaseService.addUser(user);
@@ -108,6 +121,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
           key: _formKey,
           child: Column(
             children: [
+              GestureDetector(
+                onTap: _pickImage,
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundImage:
+                      _profileImage != null ? FileImage(_profileImage!) : null,
+                  child: _profileImage == null
+                      ? const Icon(Icons.add_a_photo, size: 40)
+                      : null,
+                ),
+              ),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _usernameController,
                 decoration:

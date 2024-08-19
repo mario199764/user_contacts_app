@@ -15,8 +15,8 @@ class UserScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           authProvider.username != null
-              ? 'Name: ${authProvider.username}'
-              : 'User',
+              ? 'Nombre: ${authProvider.username}'
+              : 'Usuario',
         ),
         actions: [
           IconButton(
