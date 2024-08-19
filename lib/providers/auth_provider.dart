@@ -6,11 +6,13 @@ class AuthProvider extends ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService();
   final SessionManager _sessionManager = SessionManager();
   bool _isAuthenticated = false;
+  int? _userId;
   String? _email;
   String? _username;
   String? _avatar;
 
   bool get isAuthenticated => _isAuthenticated;
+  int? get userId => _userId;
   String? get email => _email;
   String? get username => _username;
   String? get avatar => _avatar;
@@ -19,6 +21,7 @@ class AuthProvider extends ChangeNotifier {
     final user = await _databaseService.validateUser(email, password);
     if (user != null) {
       _isAuthenticated = true;
+      _userId = user['id'];
       _email = user['email'];
       _username = user['username'];
       _avatar = user['avatar'];

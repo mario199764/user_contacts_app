@@ -35,10 +35,12 @@ class DatabaseService {
   Future _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE contacts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        identification TEXT NOT NULL
-      )
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      identification TEXT NOT NULL,
+      user_id INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
     ''');
 
     await db.execute('''
@@ -125,9 +127,14 @@ class DatabaseService {
     return await db.insert('contacts', contact);
   }
 
-  Future<List<Map<String, dynamic>>> fetchContacts() async {
+  Future<List<Map<String, dynamic>>> fetchContacts(
+      {required int userId}) async {
     final db = await database;
-    return await db.query('contacts');
+    return await db.query(
+      'contacts',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
   }
 
   Future<int> updateContact(int id, Map<String, dynamic> contact) async {

@@ -1,7 +1,7 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
+import '../providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class ContactsScreen extends StatefulWidget {
   @override
@@ -19,8 +19,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadContacts();
-    searchController.addListener(_filterContacts);
+    final userId = Provider.of<AuthProvider>(context, listen: false).userId;
+    if (userId != null) {
+      _loadContacts(userId);
+      searchController.addListener(_filterContacts);
+    }
   }
 
   @override
@@ -30,8 +33,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
     super.dispose();
   }
 
-  void _loadContacts() async {
-    contacts = await _databaseService.fetchContacts();
+  void _loadContacts(int userId) async {
+    contacts = await _databaseService.fetchContacts(userId: userId);
     setState(() {
       filteredContacts = contacts;
     });
@@ -42,8 +45,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
     if (query.length >= 3) {
       setState(() {
         filteredContacts = contacts.where((contact) {
-          return contact['name']!.toLowerCase().contains(query.toLowerCase()) ||
-              contact['identification']!.contains(query);
+          return contact['name'].toLowerCase().contains(query.toLowerCase()) ||
+              contact['identification'].contains(query);
         }).toList();
       });
     } else {
@@ -81,7 +84,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
     return null;
   }
 
-  void _showAddContactDialog(BuildContext context) {
+  void _showAddContactDialog(BuildContext context, int userId) {
     final nameController = TextEditingController();
     final idController = TextEditingController();
 
@@ -131,8 +134,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
                             await _databaseService.addContact({
                               'name': nameController.text,
                               'identification': idController.text,
+                              'user_id': userId,
                             });
-                            _loadContacts();
+                            _loadContacts(userId);
                             Navigator.of(context).pop();
                           }
                         }
@@ -149,6 +153,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userId = Provider.of<AuthProvider>(context).userId;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mis contactos'),
@@ -192,9 +198,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
               separatorBuilder: (context, index) => const Divider(),
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddContactDialog(context);
-        },
+        onPressed: userId != null
+            ? () {
+                _showAddContactDialog(context, userId);
+              }
+            : null,
         child: const Icon(Icons.add),
       ),
     );
