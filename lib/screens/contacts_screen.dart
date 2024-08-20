@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
 import '../providers/auth_provider.dart';
@@ -172,14 +174,21 @@ class _ContactsScreenState extends State<ContactsScreen> {
               controller: searchController,
               decoration: InputDecoration(
                 hintText: 'Buscar contactos...',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: Icon(Icons.search,
+                    color: Theme.of(context).iconTheme.color),
+                hintStyle: TextStyle(color: Theme.of(context).hintColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
+                  borderSide: const BorderSide(
+                    color: Colors.white,
+                  ),
                 ),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).inputDecorationTheme.fillColor ??
+                    Theme.of(context).cardColor,
               ),
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyLarge?.color),
             ),
           ),
         ),

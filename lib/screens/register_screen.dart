@@ -115,68 +115,71 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(
         title: const Text('Registrar'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 40,
-                  backgroundImage:
-                      _profileImage != null ? FileImage(_profileImage!) : null,
-                  child: _profileImage == null
-                      ? const Icon(Icons.add_a_photo, size: 40)
-                      : null,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _usernameController,
-                decoration:
-                    const InputDecoration(labelText: 'Nombre de usuario'),
-                validator: validateUsername,
-              ),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                validator: validateEmail,
-              ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Contraseña'),
-                obscureText: !_isPasswordVisible,
-                validator: validatePassword,
-              ),
-              TextFormField(
-                controller: _confirmPasswordController,
-                decoration:
-                    const InputDecoration(labelText: 'Confirmar Contraseña'),
-                obscureText: !_isPasswordVisible,
-                validator: validateConfirmPassword,
-              ),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isPasswordVisible,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        _isPasswordVisible = value!;
-                      });
-                    },
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: _profileImage != null
+                        ? FileImage(_profileImage!)
+                        : null,
+                    child: _profileImage == null
+                        ? const Icon(Icons.add_a_photo, size: 40)
+                        : null,
                   ),
-                  const Text('Mostrar contraseñas'),
-                ],
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: const Text('Registrar'),
-              ),
-            ],
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _usernameController,
+                  decoration:
+                      const InputDecoration(labelText: 'Nombre de usuario'),
+                  validator: validateUsername,
+                ),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: validateEmail,
+                ),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Contraseña'),
+                  obscureText: !_isPasswordVisible,
+                  validator: validatePassword,
+                ),
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  decoration:
+                      const InputDecoration(labelText: 'Confirmar Contraseña'),
+                  obscureText: !_isPasswordVisible,
+                  validator: validateConfirmPassword,
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _isPasswordVisible,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _isPasswordVisible = value!;
+                        });
+                      },
+                    ),
+                    const Text('Mostrar contraseñas'),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _submitForm,
+                  child: const Text('Registrar'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

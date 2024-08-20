@@ -76,7 +76,7 @@ class UserScreen extends StatelessWidget {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Usuario',
+            label: 'Inicio',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.contacts),
