@@ -1,10 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'providers/auth_provider.dart';
-import 'providers/contact_provider.dart';
+import 'providers/theme_provider.dart';
 import 'app_routes.dart';
 
 void main() {
@@ -28,17 +27,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Inicializa AuthProvider y verifica la sesión al iniciar la aplicación
-        ChangeNotifierProvider(create: (_) => AuthProvider()..checkSession()),
-        ChangeNotifierProvider(create: (_) => ContactProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        title: 'Flutter App',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        initialRoute: AppRoutes.initialRoute,
-        routes: AppRoutes.getRoutes(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'User Contacts App',
+            theme:
+                themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
+            initialRoute: AppRoutes.initialRoute,
+            routes: AppRoutes.getRoutes(),
+            debugShowCheckedModeBanner: false,
+          );
+        },
       ),
     );
   }
