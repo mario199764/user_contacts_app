@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.user_contacts_app"
-    compileSdkVersion 34 // Cambiado a 34 para cumplir con los requisitos del plugin
+    compileSdkVersion 34 
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -43,7 +43,7 @@ android {
     defaultConfig {
         applicationId "com.example.user_contacts_app"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 34 // Cambiado a 34 para cumplir con los requisitos del plugin
+        targetSdkVersion 34 
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

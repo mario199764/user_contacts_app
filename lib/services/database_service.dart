@@ -55,12 +55,12 @@ class DatabaseService {
   }
 
   Future<void> _checkAndCreateTables(Database db) async {
-    // Verificar si la tabla 'users' existe
+    //verificar si la tabla users existe
     var result = await db.rawQuery(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='users';");
 
     if (result.isEmpty) {
-      // Crear tabla 'users' si no existe
+      //crear tabla users si no existe
       await db.execute('''
         CREATE TABLE users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,12 +70,12 @@ class DatabaseService {
       ''');
     }
 
-    // Verificar si la tabla 'contacts' existe
+    //verificar si la tabla contacts existe
     result = await db.rawQuery(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='contacts';");
 
     if (result.isEmpty) {
-      // Crear tabla 'contacts' si no existe
+      //crear tabla contacts si no existe
       await db.execute('''
         CREATE TABLE contacts (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
