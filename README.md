@@ -19,8 +19,9 @@ Antes de empezar, asegúrate de cumplir con los siguientes requisitos:
 1. **Clona el repositorio**:
    ```bash
    git clone https://github.com/mario199764/user_contacts_app.git
-   cd tu-repositorio
+   cd tu-proyecto-local
 2. **Instala las dependencias utilizando**:
+    ```bash
    flutter pub get
 3. **Configura la base de datos**:
    La aplicación usa SQLite como base de datos local. No se requiere configuración adicional ya que el paquete sqflite de Flutter maneja la creación y gestión de la base de datos automáticamente.
