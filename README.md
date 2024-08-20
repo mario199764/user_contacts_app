@@ -30,16 +30,23 @@ Antes de empezar, asegúrate de cumplir con los siguientes requisitos:
 ## Ejecución de la App
 
 1. **Conecta tu dispositivo Android o inicia un emulador de Android.**
-2. **Ejecuta la app con este comando**: flutter run
+2. **Ejecutar la app**: 
+    ```bash
+    flutter run
 
 ## Funcionalidades
 
-Autenticación de Usuario: Sistema de inicio de sesión y registro seguro.
-Gestión de Contactos: Añadir, editar, eliminar y buscar contactos.
-Modo Oscuro: Alterna entre los modos claro y oscuro para una mejor experiencia de usuario.
-Foto de Perfil: Posibilidad de subir una foto de perfil durante el registro.
+- **Autenticación de Usuario**: Sistema de inicio de sesión y registro seguro.
+
+- **Gestión de Contactos**: Añadir, editar, eliminar y buscar contactos.
+
+- **Modo Oscuro**: Alterna entre los modos claro y oscuro para una mejor experiencia de usuario.
+
+- **Foto de Perfil**: Posibilidad de subir una foto de perfil durante el registro.
 
 ## Problemas Conocidos
 
-Permisos: Asegúrate de que todos los permisos necesarios (como el acceso a archivos para las fotos de perfil) estén concedidos en el dispositivo.
-Compatibilidad: La aplicación está optimizada para Android. El soporte para iOS está en desarrollo.
+- **Permisos**: Asegúrate de que todos los permisos necesarios (como el acceso a archivos para las fotos de perfil) estén concedidos en el dispositivo.
+
+- **Compatibilidad**: La aplicación está optimizada para Android. El soporte para iOS está en desarrollo.
+
