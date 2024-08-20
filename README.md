@@ -18,7 +18,7 @@ Antes de empezar, asegúrate de cumplir con los siguientes requisitos:
 
 1. **Clona el repositorio**:
    ```bash
-   git clone [https://github.com/tu-usuario/tu-repositorio.git](https://github.com/mario199764/user_contacts_app.git)
+   git clone [https://github.com/mario199764/user_contacts_app.git]
    cd tu-repositorio
 2. **Instala las dependencias utilizando**:
    flutter pub get
