@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._();
   static Database? _database;
+  final int versionCode = 1;
 
   DatabaseService._();
 
@@ -20,27 +21,22 @@ class DatabaseService {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-
     return await openDatabase(
       path,
-      version: 1,
+      version: versionCode,
       onCreate: _createDB,
-      onUpgrade: _onUpgrade,
-      onOpen: (db) async {
-        await _checkAndCreateTables(db);
-      },
     );
   }
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE contacts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      identification TEXT NOT NULL,
-      user_id INTEGER NOT NULL,
-      FOREIGN KEY (user_id) REFERENCES users(id)
-    )
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        identification TEXT NOT NULL,
+        user_id INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      )
     ''');
 
     await db.execute('''
@@ -48,42 +44,11 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
         email TEXT NOT NULL UNIQUE,
-        avatar TEXT NULLABLE,
-        password TEXT NOT NULL
-    )
+        avatar TEXT,
+        password TEXT NOT NULL,
+        biometry TEXT
+      )
     ''');
-  }
-
-  Future<void> _checkAndCreateTables(Database db) async {
-    //verificar si la tabla users existe
-    var result = await db.rawQuery(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='users';");
-
-    if (result.isEmpty) {
-      //crear tabla users si no existe
-      await db.execute('''
-        CREATE TABLE users (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          email TEXT NOT NULL UNIQUE,
-          password TEXT NOT NULL
-        )
-      ''');
-    }
-
-    //verificar si la tabla contacts existe
-    result = await db.rawQuery(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='contacts';");
-
-    if (result.isEmpty) {
-      //crear tabla contacts si no existe
-      await db.execute('''
-        CREATE TABLE contacts (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          identification TEXT NOT NULL
-        )
-      ''');
-    }
   }
 
   Future<Map<String, dynamic>?> validateUser(
@@ -101,12 +66,6 @@ class DatabaseService {
     return null;
   }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await db.execute("ALTER TABLE users ADD COLUMN avatar TEXT");
-    }
-  }
-
   Future<void> updateAvatar(String email, String avatarPath) async {
     final db = await database;
     await db.update(
@@ -117,9 +76,26 @@ class DatabaseService {
     );
   }
 
-  Future<int> addUser(Map<String, dynamic> user) async {
+  Future<String?> addUser(Map<String, dynamic> user) async {
     final db = await database;
-    return await db.insert('users', user);
+
+    //verificar si el email ya existe
+    final existingUser = await db.query(
+      'users',
+      where: 'email = ?',
+      whereArgs: [user['email']],
+    );
+
+    if (existingUser.isNotEmpty) {
+      return 'Ya existe un usuario con este email';
+    }
+
+    try {
+      await db.insert('users', user);
+      return null;
+    } catch (e) {
+      return 'Error al registrar usuario. Por favor inténtalo de nuevo.';
+    }
   }
 
   Future<int> addContact(Map<String, dynamic> contact) async {
