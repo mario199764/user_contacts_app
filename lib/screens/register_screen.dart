@@ -95,15 +95,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'avatar': _profileImage?.path,
       };
 
-      int result = await _databaseService.addUser(user);
+      String? errorMessage = await _databaseService.addUser(user);
 
-      if (result != -1) {
+      if (errorMessage == null) {
         Navigator.pushReplacementNamed(context, '/');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(
-                  'Error al registrar usuario. Por favor inténtalo de nuevo.')),
+          SnackBar(content: Text(errorMessage)),
         );
       }
     }
