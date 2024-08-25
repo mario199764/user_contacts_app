@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 
@@ -14,14 +16,18 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final LocalAuthentication _localAuth = LocalAuthentication();
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
   bool _isLoginButtonEnabled = false;
   bool _isPasswordVisible = false;
+  bool _isBiometricAvailable = false;
 
   @override
   void initState() {
     super.initState();
     _emailController.addListener(_checkFormCompletion);
     _passwordController.addListener(_checkFormCompletion);
+    _checkBiometricOption();
   }
 
   @override
@@ -37,6 +43,53 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoginButtonEnabled = isFormComplete;
     });
+  }
+
+  Future<void> _checkBiometricOption() async {
+    final biometryToken = await _storage.read(key: 'biometryToken');
+    if (biometryToken != null) {
+      setState(() {
+        _isBiometricAvailable = true;
+      });
+    }
+  }
+
+  Future<void> _loginWithBiometrics() async {
+    final didAuthenticate = await _localAuth.authenticate(
+      localizedReason: 'Autentícate para ingresar con biometría.',
+      options: const AuthenticationOptions(biometricOnly: true),
+    );
+
+    if (didAuthenticate) {
+      print("Autenticación biométrica exitosa");
+      final email = await _storage.read(key: 'email');
+      final password = await _storage.read(key: 'password');
+      print('email recuperado: $email');
+      print('password recuperado: $password');
+
+      if (email != null && password != null) {
+        print("Credenciales recuperadas: $email");
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        bool success = await authProvider.login(email, password);
+        if (success) {
+          print("Inicio de sesión exitoso");
+          Navigator.pushReplacementNamed(context, '/user');
+        } else {
+          print("Falló la autenticación en el servidor");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Falló la autenticación biométrica')),
+          );
+        }
+      } else {
+        print("No se pudieron recuperar las credenciales almacenadas");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('No se encontraron credenciales almacenadas')),
+        );
+      }
+    } else {
+      print("Autenticación biométrica fallida o cancelada");
+    }
   }
 
   @override
@@ -63,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
                 controller: _emailController,
@@ -101,32 +155,48 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _isLoginButtonEnabled
-                    ? () async {
-                        if (_formKey.currentState!.validate()) {
-                          bool success = await authProvider.login(
-                            _emailController.text,
-                            _passwordController.text,
-                          );
-                          if (success) {
-                            Navigator.pushReplacementNamed(context, '/user');
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Credenciales no válidas')),
+              SizedBox(
+                height: 50, //altura para todos los botones
+                child: ElevatedButton(
+                  onPressed: _isLoginButtonEnabled
+                      ? () async {
+                          if (_formKey.currentState!.validate()) {
+                            bool success = await authProvider.login(
+                              _emailController.text,
+                              _passwordController.text,
                             );
+                            if (success) {
+                              Navigator.pushReplacementNamed(context, '/user');
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Credenciales no válidas')),
+                              );
+                            }
                           }
                         }
-                      }
-                    : null,
-                child: const Text('Ingreso'),
+                      : null,
+                  child: const Text('Ingreso'),
+                ),
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/register');
-                },
-                child: const Text('Registro'),
+              const SizedBox(height: 10),
+              if (_isBiometricAvailable)
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _loginWithBiometrics,
+                    child: const Text('Biometría'),
+                  ),
+                ),
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 50,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/register');
+                  },
+                  child: const Text('Registro'),
+                ),
               ),
             ],
           ),
