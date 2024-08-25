@@ -10,12 +10,14 @@ class AuthProvider extends ChangeNotifier {
   String? _email;
   String? _username;
   String? _avatar;
+  String? _password;
 
   bool get isAuthenticated => _isAuthenticated;
   int? get userId => _userId;
   String? get email => _email;
   String? get username => _username;
   String? get avatar => _avatar;
+  String? get password => _password;
 
   Future<bool> login(String email, String password) async {
     final user = await _databaseService.validateUser(email, password);
@@ -25,6 +27,7 @@ class AuthProvider extends ChangeNotifier {
       _email = user['email'];
       _username = user['username'];
       _avatar = user['avatar'];
+      _password = user['password'];
       await _sessionManager.createSession(email);
     } else {
       _isAuthenticated = false;
