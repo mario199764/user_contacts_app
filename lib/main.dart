@@ -23,11 +23,15 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  //GlobalKey NavigatorState global
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider(MyApp.navigatorKey)),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: Consumer<ThemeProvider>(
@@ -36,6 +40,7 @@ class MyApp extends StatelessWidget {
             title: 'User Contacts App',
             theme:
                 themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
+            navigatorKey: navigatorKey,
             initialRoute: AppRoutes.initialRoute,
             routes: AppRoutes.getRoutes(),
             debugShowCheckedModeBanner: false,
