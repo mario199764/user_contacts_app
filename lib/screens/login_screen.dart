@@ -31,6 +31,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkAutoLogout();
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
@@ -54,6 +60,38 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _checkAutoLogout() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.autoLoggedOut) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showAutoLogoutDialog();
+        authProvider.resetAutoLoggedOutFlag();
+      });
+    }
+  }
+
+  Future<void> _showAutoLogoutDialog() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sesión cerrada por inactividad'),
+          content: const Text(
+              'Tu sesión se cerró automáticamente debido a inactividad. Por favor, vuelve a iniciar sesión.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _loginWithBiometrics() async {
     final didAuthenticate = await _localAuth.authenticate(
       localizedReason: 'Autentícate para ingresar con biometría.',
@@ -61,27 +99,20 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (didAuthenticate) {
-      print("Autenticación biométrica exitosa");
       final email = await _storage.read(key: 'email');
       final password = await _storage.read(key: 'password');
-      print('email recuperado: $email');
-      print('password recuperado: $password');
 
       if (email != null && password != null) {
-        print("Credenciales recuperadas: $email");
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         bool success = await authProvider.login(email, password);
         if (success) {
-          print("Inicio de sesión exitoso");
           Navigator.pushReplacementNamed(context, '/user');
         } else {
-          print("Falló la autenticación en el servidor");
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Falló la autenticación biométrica')),
           );
         }
       } else {
-        print("No se pudieron recuperar las credenciales almacenadas");
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('No se encontraron credenciales almacenadas')),
@@ -162,9 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? () async {
                           if (_formKey.currentState!.validate()) {
                             bool success = await authProvider.login(
-                              _emailController.text,
-                              _passwordController.text,
-                            );
+                                _emailController.text,
+                                _passwordController.text);
                             if (success) {
                               Navigator.pushReplacementNamed(context, '/user');
                             } else {
